@@ -22,7 +22,7 @@ public class BankClientTest {
     public void balanceTest(){
 
         com.parasuram.models.BalanceCheckRequest balanceCheckRequest=com.parasuram.models.BalanceCheckRequest.newBuilder()
-                .setAccountNumber(5)
+                .setAccountNumber(9)
                 .build();
         com.parasuram.models.Balance balance=this.bankServiceBlockingStub.getBalance(balanceCheckRequest);
         System.out.println("balance is: "+balance);
