@@ -10,7 +10,7 @@ public class BankService extends com.parasuram.models.BankServiceGrpc.BankServic
     public void getBalance(BalanceCheckRequest request, StreamObserver<Balance> responseObserver) {
         final int accountNumber = request.getAccountNumber();
         final Balance balance = Balance.newBuilder()
-                .setAmount(accountNumber * 10)
+                .setAmount(AccountDataBase.getBalance(accountNumber))
                 .build();
 
         responseObserver.onNext(balance);
