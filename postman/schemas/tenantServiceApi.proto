@@ -1,0 +1,818 @@
+syntax = "proto3";
+
+option java_multiple_files = true;
+option java_package = "com.ruckus.cloud.tenantservice.api";
+option java_outer_classname = "TenantServiceApi";
+
+package tenant;
+
+import "google/protobuf/empty.proto";
+
+
+service TenantSrvApi {
+    rpc getUserRole(GetUserRoleRequest) returns (GetUserRoleResponse) {}
+    rpc getNotificationRecipients(GetNotificationRecipientsRequest) returns (GetNotificationRecipientsResponse) {}
+    rpc syncTo(SyncToRequest) returns (Ack) {}
+    rpc getTenantData(GetTenantRequest) returns (GetTenantResponse){}
+    rpc updateMspTenant(UpdateMspTenantRequest) returns (google.protobuf.Empty){}
+    rpc updateTenant(UpdateTenantRequest) returns (google.protobuf.Empty){}
+    rpc updateAdmin(UpdateAdminRequest) returns (google.protobuf.Empty){}
+    rpc GetAdminData(GetAdminRequest) returns(GetAdminResponse){}
+    rpc grantMspToAccessMspEc(GrantMspToAccessMspEcRequest) returns (google.protobuf.Empty) {}
+    rpc assignMspToAccessMspEc(AssignMspToAccessMspEcRequest) returns (google.protobuf.Empty) {}
+    rpc revokeMspToAccessMspEc(RevokeMspToAccessMspEcRequest) returns (google.protobuf.Empty) {}
+    rpc updateDelegatedMspAdminList(DelegatedMspAdminList) returns (google.protobuf.Empty) {}
+    // New Addons start
+    rpc assignMspEcsToDelegatedId(AssignMspEcToDelegated) returns (google.protobuf.Empty) {}
+    rpc getMspEcsByDelegatedId(DelegatedIdRequest) returns (AssignMspEcList) {}
+    rpc revokeMspEcsToDelegatedId(AssignMspEcToDelegated) returns (google.protobuf.Empty) {}
+    // New Addons end
+    rpc getDelegatedMspAdminList(GetDelegatedMspAdminListRequest) returns (DelegatedMspAdminList) {}
+    rpc getTenantBranding(BrandingRequest) returns (BrandingResponse) {}
+    rpc getSyncToStatus(SyncToStatusRequest) returns (SyncToStatusResponse) {}
+    rpc replaceMspEcExternalIds(ReplaceExternalIdRequest) returns (google.protobuf.Empty) {}
+    rpc updateTenantActivation(ActivationChangeRequest) returns (RequestAck) {}
+    //TODO: ALTO-10756: Deprecated APIs (To be removed after ptenant completion)
+    rpc updateUpgradeGroup(UpdateUpgradeGroupRequest) returns (Ack) {}
+    rpc getTenantsByUpgradeGroup(GetTenantsByUpgradeGroupRequest) returns (GetTenantsByUpgradeGroupResponse) {}
+    rpc getUpgradeGroupList(google.protobuf.Empty) returns (UpgradeGroupListResponse) {}
+    rpc updateTenantExternalID(UpdateTenantRequest) returns (google.protobuf.Empty){}
+    rpc getAdminViewData(GetAdminViewRequest) returns (GetAdminViewResponse){}
+    rpc getMspEcAdminByTenant(MspEcAdminRequest) returns(MspEcAdminResponse) {}
+    rpc getAdminAuthenticationMethod(AdminAuthenticationMethodRequest) returns (AdminAuthenticationMethodResponse){}
+    rpc getAuthenticationByTenant(AuthenticationMethodRequest) returns (AdminAuthenticationMethodResponse){}
+    rpc getAuthenticationByID(AuthenticationMethodRequest) returns (AdminAuthenticationMethodResponse){}
+    rpc getAdminDelegations(AdminDelegationRequest) returns (AdminDelegationList){}
+    rpc getMSPPingOrgID(MSPPingOrgIdRequest ) returns (MSPPingOrgIdResponse) {}
+    rpc getMspLabelCount(MspLabelCountRequest ) returns (MspLabelCountResponse ){}
+    rpc isMspLabelAvailable(MSPLabelCheckRequest) returns (MSPLabelCheckResponse) {}
+    rpc getNotificationAggregationStatus(GetNotificationAggregationStatusRequest) returns (GetNotificationAggregationStatusResponse){}
+    rpc getTenantsByExternalId(GetTenantsByExternalIdRequest) returns (GetTenantsByExternalIdResponse) {}
+    rpc getFeatures(GetFeaturesRequest) returns (GetFeaturesResponse) {}
+    rpc getCustomRoles(GetCustomRoleRequest) returns (GetCustomRolesResponse) {}
+    rpc addRoleEntity(AddRoleEntityRequest) returns (AddRoleEntityResponse) {}
+    rpc getRoleEntity(GetRoleEntityRequest) returns (GetRoleEntityResponse) {}
+    rpc getRoleObjectPermissions(GetRoleObjectPermissionsRequest) returns (GetRoleObjectPermissionsResponse) {}
+    rpc getPreDefinedRoles(GetPreDefinedRoleRequest) returns (GetCustomRolesResponse) {}
+    //---Non Blocking Server Stream--------------------------
+    rpc getAdminStreamByTenantId(GetAdminByTenantIdRequest) returns (stream GetAdminByTenantIdResponse) {}
+    rpc getAllGroups(GetAllGroupsRequest) returns (GetAllGroupsResponse) {}
+    rpc getGroup(GetGroupRequest) returns (GetGroupResponse) {}
+}
+message GetTenantsByExternalIdRequest {
+    string requestId = 1;
+    string tenantId = 2;
+    repeated string externalId = 3;
+}
+
+message GetTenantsByExternalIdResponse {
+    repeated TenantData tenantData = 1;
+}
+
+message TenantData {
+    string id = 1;
+    string externalId = 2;
+    string name = 3;
+    TenantType tenantType = 4;
+}
+
+message GetPreDefinedRoleRequest {
+    string roleType = 1;
+}
+
+message GetAdminByTenantIdRequest {
+    string requestId = 1;
+    string tenantId = 2;
+}
+
+message GetAdminByTenantIdResponse {
+    string adminId = 1;
+    string externalId = 2;
+    string userName = 3;
+    string firstName = 4;
+    string lastName = 5;
+}
+
+message GetUserRoleRequest {
+    string requestId = 1;
+    string version = 2;
+    string tenantId = 3;
+    string tenantExternalId = 5;
+    string adminExternalId = 6;
+    bool isVar = 7;
+    bool isRuckusUser = 8;
+    bool isSupportUser = 9;
+    string email = 10;
+    string firstName = 11;
+    string lastName = 12;
+    MspEcData mspEcData=13;
+    Role adminRole=14 [deprecated=true];
+    string entitlementId = 15;
+    string username = 16;
+    string delegatedTenantId=17;
+    TenantType tenantType = 18;
+    string adminCustomRole=19;
+    bool isManageAllEcs = 20;
+    repeated string groups = 21;
+}
+
+message GetUserRoleResponse {
+    string requestId = 1;
+    string version = 2;
+    Role role = 3 [deprecated=true];
+    bool hasDelegations = 4;
+    bool serviceAccount = 5 ;
+    string customRole=6;
+    string group=7;
+}
+
+enum Role {
+    ROLE_UNSET = 0;
+    PRIME_ADMIN = 1;
+    ADMIN = 2;
+    READ_ONLY = 3;
+    OFFICE_ADMIN = 4;
+    SUPPORT = 5;
+    DEVOPS = 6;
+    DPSK_ADMIN=7;
+}
+
+message GetNotificationRecipientsRequest {
+    string requestId = 1;
+    string version = 2;
+    string tenantId = 3;
+}
+
+message GetNotificationRecipientsResponse {
+    string requestId = 1;
+    string version = 2;
+    repeated NotificationRecipient recipients = 3;
+    string tenantName = 4;
+}
+
+message NotificationRecipient {
+    string description = 1;
+    repeated NotificationEndpoint endpoints = 2;
+    bool isDelegatedVar = 3;
+    string tenantName = 4;
+}
+
+message NotificationEndpoint {
+    NotificationEndpointType type = 1;
+    string destination = 2;
+    bool active = 3;
+    NotificationEndpointStatus status = 4;
+    string mobilePlatform = 5;
+    bool isNotificationSuspended=6;
+}
+
+enum NotificationEndpointType {
+    NOTIFICATION_TYPE_UNSET = 0;
+    SMS = 1;
+    EMAIL = 2;
+    MOBILE_PUSH = 3;
+}
+
+enum NotificationEndpointStatus {
+    NOTIFICATION_STATUS_UNSET = 0;
+    OK = 1;
+    BOUNCED = 2;
+}
+
+message SyncToRequest {
+    string tenantId = 1;
+    map<string, string> options = 2;
+}
+
+
+message Ack {
+    string tenantId = 1;
+    string txId = 2;
+}
+
+message SyncToStatusRequest{
+  string requestId = 1;
+  string tenantId = 2;
+}
+
+message SyncToStatusResponse{
+  SyncToStatus status = 1;
+  repeated Error errors = 2;
+}
+
+message Error{
+  string code = 1;
+  string message = 2;
+}
+
+enum SyncToStatus {
+  SYNC_TO_STATUS_UNSET = 0;
+  IN_PROGRESS = 1;
+  SUCCESS = 2;
+  FAILURE = 3;
+}
+
+message GetTenantRequest {
+    string requestId = 1;
+    string version = 2;
+    string tenantId = 3;
+    TenantType tenantType = 4;
+}
+
+message ScopeInfo {
+    string authId = 1;
+    string authName = 2;
+    string scope = 3;
+}
+
+message GetTenantResponse{
+    string tenantExternalId = 1;
+    string entitlementId=2;
+    MspData mspData=3;
+    MspEcData mspEcData=4;
+    string tenantId = 5;
+    //TODO: ALTO-10756: Deprecated APIs: upgradeGroup (To be removed after ptenant completion)
+    string upgradeGroup = 6;
+    string tenantName = 7;
+    MFATenantData mfaData = 8;
+    TenantType tenantType = 9;
+    bool edgeBetaEnabled = 10;
+    bool almActivated =11;
+    string almActivationDate=12;
+    string almSysAccountId =13;
+    bool almMigrationFlag =14;
+    string almMigrationDate =15;
+    string accountTier = 16;
+    string accountVertical = 17;
+    bool isServiceAccount = 18;
+    repeated ScopeInfo scopeInfo = 19;
+    string pingOrgId = 20;
+}
+
+message GetAdminRequest{
+    string requestId=1;
+    string version=2;
+    string tenantId=3;
+    string adminId=4;
+    AdminSearchId searchId=5;
+}
+
+enum AdminSearchId {
+    AdminId = 0;
+    ExternalId = 1;
+}
+
+message GetAdminResponse{
+    string adminExternalId=2;
+    string mfaData = 3;
+    string adminId=4;
+
+}
+
+message UpdateMspTenantRequest{
+    string requestId = 1;
+    string version = 2;
+    string tenantId = 3;
+    MspData mspData=4;
+    MspEcData mspEcData=5;
+    TenantType tenantType = 6;
+}
+
+
+message UpdateTenantRequest {
+    string requestId = 1;
+    string version = 2;
+    string tenantId = 3;
+    MFATenantData mfaData =4;
+    TenantType tenantType = 5;
+    string externalId = 6;
+}
+
+message MFATenantData {
+    string mfaStatus = 1;
+    string mfaRecoveryCodes=2;
+}
+
+message UpdateAdminRequest {
+    string requestId = 1;
+    string version = 2;
+    string tenantId = 3;
+    string adminId = 4;
+    string mfaData= 5;
+    TenantType tenantType = 6;
+}
+
+
+message MspEcData {
+    string parentMspTenantId = 1;
+    string serviceExpirationDate = 2;
+    string serviceEffectiveDate = 3;
+    string mspEcTenantId = 4;
+    TenantType mspEcTenantType = 5;
+    string entitlement_assign_id = 6;
+    repeated MspDelegation  mspDelegations = 7;
+    repeated AdminDelegation AdminDelegations = 8;
+    License license = 9;
+}
+
+message MspDelegation {
+    repeated string msp_ec_ids = 1;
+    string delegation_id = 2;
+    TenantType delegation_type = 3;
+    string num_of_days = 4;
+    bool isManageAllEcs = 5;
+}
+
+message AdminDelegationList {
+    repeated AdminDelegation admin_delegations = 1;
+}
+
+message AdminDelegationRequest {
+    string tenant_id = 1;
+    string external_id = 2;
+}
+
+message AdminDelegation {
+    string admin_id = 1;
+    Role admin_role = 2 [deprecated=true];
+    string admin_custom_role=3;
+}
+
+message MspData {
+    string mspLabel=1;
+    string mspFQDN=2;
+    string logoUUID=3;
+    string contactSupportUrl=4;
+    string contractSupportBehavior=5;
+    string openCaseUrl=6;
+    string openCaseBehavior=7;
+    string myOpenCaseUrl=8;
+    string myOpenCaseBehavior=9;
+    string changePasswordUrl=10;
+    string phone=11;
+    string email=12;
+    string website=13;
+    bool IsDisableNotification=14;
+    string alarmNotificationLogoUUID =15;
+    string pingNotificationLogoUUID=16;
+    string mlisaLogoUUID=17;
+    string pingLoginLogoUUID=18;
+    string defaultLogoUUID=19;
+}
+
+message GrantMspToAccessMspEcRequest{
+    string mspEcTenantId=1;
+    string delegatedByEmail=2;
+    string delegatedToTenantId=3;
+    string delegatedToName=4;
+}
+message AssignMspToAccessMspEcRequest{
+    string mspEcTenantId=1;
+    string delegatedByEmail=2;
+    string delegatedToTenantId=3;
+    string delegatedToName=4;
+}
+
+message DelegatedIdRequest { 
+    string delegatedId=1;
+    string delegationType=2;
+}
+
+message RevokeMspToAccessMspEcRequest{
+    string mspEcTenantId=1;
+    string delegatedToTenantId=2;
+}
+
+message AssignMspAdminRequest {
+repeated DelegatedMspAdminList delegatedMspAdminList = 1; //required
+}
+
+message DelegatedMspAdminList{
+    string mspEcTenantId=1;
+    string delegatedToTenantId=2;
+    repeated DelegatedAdminRole admin=3;
+}
+
+message AssignMspEcToDelegated{
+    string delegatedId = 1;
+    string delegationType = 2;
+    string mspEcTenantId = 3;
+    string numberOfDays = 4;
+}
+
+message AssignMspEcList{
+    string delegatedId = 1;
+    string delegationType = 2;
+    string expiryDate = 3;
+    repeated AssignMspEc mspEc = 4;
+}
+
+message AssignMspEc {
+    string mspEcTenantId = 1;
+}
+
+message GetDelegatedMspAdminListRequest{
+    string mspEcTenantId=1;
+    string delegatedToTenantId=2;
+}
+
+message DelegatedAdminRole {
+    string adminId = 1;
+    Role adminRole = 2 [deprecated=true];
+    string adminCustomRole=3;
+}
+
+message BrandingRequest{
+    string tenantId = 1;
+    //TODO: ALTO-10756: Deprecated APIs: externalId (To be removed after ptenant completion)
+    string externalId = 2;
+}
+
+message BrandingResponse{
+    string tenantId=1;
+    string mspBrandingTenantId = 2;
+    string mspLabel=3;
+    string logoId=4;
+    string contactSupportUrl=5;
+    string contractSupportBehavior=6;
+    string openCaseUrl=7;
+    string openCaseBehavior=8;
+    string myOpenCaseUrl=9;
+    string myOpenCaseBehavior=10;
+    string changePasswordUrl=11;
+    string phone=12;
+    string email=13;
+    string website=14;
+    TenantType tenantType=15;
+    string AlarmNotificationLogoId=16;
+    string PingNotificationLogoId=17;
+    string MlisaLogoId=18;
+    string PingLoginLogoId=19;
+    string DefaultLogoId=20;
+}
+
+
+message ActivationChangeRequest{
+    string tenantId=1;
+    bool isActivated=2;
+    bool compensation=3;
+    string mspTenantId=4;
+}
+
+message RequestAck {
+    string tenantId = 1;
+}
+
+enum TenantType {
+  REC = 0;
+  MSP = 1;
+  MSP_EC = 2;
+  VAR = 3;
+  MSP_NON_VAR = 4;
+  UNKNOWN = 5;
+  MSP_INSTALLER = 6;
+  MSP_INTEGRATOR = 7;
+  MSP_REC = 8;
+}
+
+
+//TODO: ALTO-10756: Deprecated APIs (To be removed after ptenant completion)
+message UpdateUpgradeGroupRequest {
+    string tenantId = 1;
+    string upgradeGroup = 2;
+}
+
+message GetTenantsByUpgradeGroupRequest {
+    repeated string upgradeGroup = 1;
+    int32 pageSize = 2;//default: 100
+    int32 pageNumber = 3;
+}
+
+message GetTenantsByUpgradeGroupResponse {
+    repeated TenantUpgradeGroup tenantUpgradeGroup = 1;
+    PageInfo pageInfo = 2;
+}
+
+message TenantUpgradeGroup {
+    string tenantId = 1;
+    string upgradeGroup = 2;
+}
+
+message PageInfo {
+    int32 number = 1;
+    int32 size = 2;
+    int32 numberOfElements = 3;
+    int32 totalPages = 4;
+    int64 totalElements = 5;
+    bool isLast = 6;
+}
+
+message UpgradeGroupListResponse {
+    repeated string upgradeGroup = 1;
+}
+
+
+message ReplaceExternalIdRequest{
+  string DyingMspTenantId=1;
+  repeated ExternalAccountIdMapping externalAccountIdMapping=2;
+  repeated ExternalAdminIdMapping externalAdminIdMapping=3;
+
+}
+
+message ExternalAccountIdMapping{
+  string oldId=1;
+  string newId=2;
+}
+
+message ExternalAdminIdMapping{
+  string oldId=1;
+  string newId=2;
+}
+
+message GetAdminViewResponse{
+    string externalId = 1;
+    string tenantId   = 2;
+    string userEmail = 3;
+}
+
+message GetAdminViewRequest{
+    string requestId = 1;
+    string version   = 2;
+    string tenantId  = 3;
+}
+
+message AdminData {
+  string id = 1;
+  string tenantId = 2;
+  string adminId = 3;
+  string role = 4;
+  string delegatedTo = 5;
+  string delegateRoleType = 6;
+}
+
+message MspEcAdminRequest {
+  string tenantId = 1; 
+}
+
+message MspEcAdminResponse {
+  repeated AdminData roles = 1; 
+}
+
+message TenantUpdateEvent {
+    TenantDetails tenantDetails = 1;
+    Action operation = 2;
+    Venue venue= 3;
+    License license = 4;
+}
+
+message TenantDetails {
+    string tenantName = 1;
+    string externalId = 2;
+    string tenantId = 3;
+    string time = 4;
+    string entitlementId = 5;
+    bool isRuckusUser =6;
+    string tenantType= 7;
+    string admin_email = 8;
+    string first_name = 9;
+    string last_name = 10;
+    string parentTenantId = 11 ;
+    bool almActivated = 12 ;
+    string almActivationDate = 13;
+    string almSysAccountId =14;
+    bool almMigrationFlag =15;
+    string almMigrationDate =16;
+    string accountTier = 17;
+    string accountVertical = 18;
+
+}
+
+message Venue {
+    string country = 1;
+    string city = 2;
+    string streetAddress = 3;
+    string stateOrProvince = 4;
+    string postalCode = 5;
+    string mapUrl =6;
+}
+message EntitlementAssignment {
+    int64 assignmentId = 1;
+    int64 quantity = 2;
+    bool isTrial = 3;
+    string deviceType = 4;
+    string deviceSubType = 5;
+    Action action = 6 ;
+    string licenseType = 7;
+}
+
+enum TrialAction {
+    UNASSIGNED = 0; // Default is unassigned
+    ACTIVATE = 1;
+    DEACTIVATE = 2;
+}
+
+message License {
+    TrialAction trialAction = 1;
+    repeated EntitlementAssignment assignments = 2;
+    string assignmentStartDate = 3;
+    string assignmentEndDate = 4;
+
+}
+
+// In future it can have other Actions like update etc
+enum Action {
+    UNSET = 0;
+    ADD = 1;
+    MODIFY=2;
+    DELETE=3;
+}
+enum AdminAction {
+    UNSET_ADMIN = 0;
+    ADD_ADMIN = 1;
+    DELETE_ADMIN = 2;
+    UPDATE_ADMIN = 3;
+    ADD_ROLE_ADMIN = 4;
+}
+
+enum AuthenticationType {
+    NOT_DEFINED = 0;
+    SAML = 1;
+    OAUTH2_OIDC = 2;
+    RADIUS = 3;
+    LDAP = 4;
+    IDM =5;
+    OAUTH2_CLIENT_CREDENTIALS = 6;
+}
+
+message AdminAuthenticationMethodRequest {
+    string adminEmail = 1;
+}
+
+message AuthenticationMethodRequest {
+    string clientId = 1;
+    string tenantId = 2;
+    string authenticationId = 3;
+}
+
+message AuthDetails {
+    string clientID =1 ;
+    string clientSecret =2;
+    string scopes =3;
+    string tokenURL =4;
+    string authorizationURL =5;
+    string samlFileURL= 6;
+    string name =7;
+    string ID=8;
+    bool revoke=9;
+}
+
+message AuthInfo {
+    string tenantId = 1;
+    string companyName = 2;
+    AuthenticationType authenticationType = 3;
+    AuthDetails authDetails =4;
+    string adminId = 5;
+    string adminRole = 6;
+}
+
+message AdminAuthenticationMethodResponse {
+    repeated AuthInfo authInfos = 1;
+}
+
+message  MSPPingOrgIdRequest {
+    string mspLabel = 1;
+}
+message  MSPPingOrgIdResponse {
+    string mspPingOrgId = 1;
+}
+
+message MspLabelCountRequest{}
+
+message MspLabelCountResponse{
+    int32 mspLabelCount = 1;
+}
+
+message  MSPLabelCheckRequest {
+    string mspLabel = 1;
+}
+message  MSPLabelCheckResponse {
+    bool isLabelAvailable = 1;
+}
+
+message GetNotificationAggregationStatusRequest {
+    string tenantId = 1;
+    string requestId = 2;
+}
+
+message GetNotificationAggregationStatusResponse {
+    bool aggregationEnabled = 1;
+    bool ecExclusionEnabled = 2;
+}
+
+message GetCustomRoleRequest {
+    string tenantId = 1;
+    string requestId = 2;
+    string roleName = 3;
+}
+
+
+message GetFeaturesRequest {
+    string category = 1;
+}
+
+message GetFeaturesResponse {
+    repeated FeatureDetails featureDetails = 1;
+}
+
+message FeatureDetails {
+    string id = 1;
+    string name = 2;
+    string description = 3;
+    repeated ScopeDetails scopeDetails = 4;
+}
+
+message ScopeDetails {
+    string scopeId = 1;
+    string scopeName = 2;
+}
+
+message GetCustomRolesResponse {
+    repeated CustomRoleDetails customRoleDetails = 1;
+    repeated RoleObjectPermission roleObjectPermission = 2;
+}
+
+message CustomRoleDetails {
+    string id = 1;
+    string name = 2;
+    string description = 3;
+    bool policy = 4;
+    bool frameworkRO = 5;
+    repeated ScopeDetails scopeDetails = 6;
+}
+
+message AddRoleEntityRequest {
+    RoleEntity roleEntity = 1;
+}
+
+message AddRoleEntityResponse {
+    RoleEntity roleEntity = 1;
+}
+
+message GetRoleEntityRequest {
+    string roleEntityId = 1;
+    string serviceName = 2;
+}
+
+message GetRoleEntityResponse {
+    repeated RoleEntity roleEntity = 1;
+}
+
+message RoleEntity {
+    string serviceName = 1;
+    string objectType = 2;
+}
+
+message GetRoleObjectPermissionsRequest {
+    string roleObjectPermissionsId = 1;
+    string roleName = 2;
+}
+
+message GetRoleObjectPermissionsResponse {
+    repeated RoleObjectPermission roleObjectPermission = 1;
+}
+
+message RoleObjectPermission {
+    string entityInstanceId = 1;
+    string customRoleId = 2;
+    string tenantId = 3;
+    string roleEntityId = 4;
+    bool read = 5;
+    bool update = 6;
+    bool add = 7;
+    bool delete = 8;
+    bool apply = 9;
+    string conditions = 10;
+}
+
+message GetAllGroupsRequest {}
+
+message Group {
+    string name = 1;
+    string groupId = 2;
+    string contact = 3;
+    string contactEmail = 4;
+    int32 processingPriority = 5;
+}
+
+message GetAllGroupsResponse {
+    repeated Group group = 1;
+}
+
+message GetGroupRequest {
+    string groupId = 1;
+    string name = 2;
+}
+
+message GetGroupResponse {
+    Group group = 1;
+}
